@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { Container } from '@mui/system';
-import { Paper, Button, IconButton, Tooltip, Card } from '@mui/material';
+import { Paper, Button, IconButton, Tooltip, Card, InputLabel, FormLabel } from '@mui/material';
 
 
 export default function Customer() {
@@ -11,12 +11,14 @@ export default function Customer() {
 
     const [custID, setCustID] = useState('')
     const [initCredit, setInitCredit] = useState('')
+    const [fetcherror, setFetcherror] = useState('')
     const [firstname, setFirstname] = useState('')
     const [lastname, setLastname] = useState('')
     const [account, setAccount] = useState('')
     const [balance, setBalance] = useState('')
     const [customers, setCustomers] = useState([])
     const [txns, setTxns] = useState([])
+
     
 
     const openaccount = (e) => {
@@ -24,11 +26,20 @@ export default function Customer() {
         const customer = [custID, initCredit]
         //console.log(customer)
 
-        fetch(`http://localhost:80/openaccount/${custID}/${initCredit}`, {
+        //fetch(`http://localhost:80/openaccount/${custID}/${initCredit}`, {
+        fetch(`https://fintechapp-production.up.railway.app/openaccount/${custID}/${initCredit}`, {
             method: "GET",
             mode: 'no-cors',
             headers: { "Content-Type": "application/json" },
-        }).then(() => { console.log("New Account created!") })
+        }).then(response => { if(!response.ok) setFetcherror("Ups! Something went wrong!");       })
+
+        
+
+        //setFetcherror("aaa");
+        //let resultJson =  res.catch(er =>setFetcherror(er.value));
+        // let resultError = resultJson['error'];
+        // setFetcherror(resultError);
+        console.log("New Account created!");
     }
 
     const getcustomerinfo = (e) => {
@@ -36,7 +47,8 @@ export default function Customer() {
         const customer = [custID, firstname, lastname, account, balance]
         //console.log(customer)
 
-        const res = fetch(`http://localhost:80/userinformation/${custID}`, {
+        //const res = fetch(`http://localhost:80/userinformation/${custID}`, {
+        const res = fetch(`https://fintechapp-production.up.railway.app/userinformation/${custID}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             //body: JSON.stringify(customer),
@@ -55,9 +67,10 @@ export default function Customer() {
     const getcustomertxns = (e) => {
         e.preventDefault()
         //const customer = [custID, firstname, lastname, account, balance]
-        console.log(`http://localhost/accounttxn/${custID}/${account}`)
+        //console.log(`http://localhost/accounttxn/${custID}/${account}`)
 
-        const res = fetch(`http://localhost/accounttxn/${custID}/${account}`, {
+        //const res = fetch(`http://localhost/accounttxn/${custID}/${account}`, {
+        const res = fetch(`https://fintechapp-production.up.railway.app/accounttxn/${custID}/${account}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             //body: JSON.stringify(customer),
@@ -91,13 +104,14 @@ export default function Customer() {
                 >
                     <TextField id="standard-basic" label="Customer ID" variant="standard" fullWidth
                         value={custID}
-                        onChange={(e) => setCustID(e.target.value)} />
+                        onChange={(e) => {setCustID(e.target.value); setFetcherror("");}} />
                     <TextField id="standard-basic" label="Initial credit" variant="standard" fullWidth
                         value={initCredit}
-                        onChange={(e) => setInitCredit(e.target.value)} />
+                        onChange={(e) => {setInitCredit(e.target.value); setFetcherror("");}} />
                     <Button variant="contained" color="success" onClick={openaccount}>
                         Submit
                     </Button >
+                    <TextField id="standard-basic" variant="standard" fullWidth value={fetcherror} inputProps={{readOnly: true, disabled: true,}}/>
                 </Box>
             </Paper>
             <Paper elevation={3} style={Paperstyle}>
